@@ -1,0 +1,8 @@
+create schema login authorization example;
+create table login.users (
+	username varchar(20) primary key,
+	password varchar(20) not null
+);
+insert into login.users (username, password) values ('admin', 'complex password');
+insert into login.users (username, password) values ('user', 'password123');
+insert into login.users (username, password) values ('example', 'anotherpassword123');

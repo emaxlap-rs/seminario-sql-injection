@@ -358,7 +358,7 @@
       <a class="forgot" href="#">Password dimenticata?</a>
     </div>
 
-    <button class="btn-login" onclick="handleLogin()">Accedi</button>
+    <button type="button" class="btn-login" onclick="handleLogin()">Accedi</button>
   </form>
 </div>
 
@@ -400,10 +400,14 @@
         'Content-Type': 'text/plain',
       },
       body: `username=${u}&password=${p}`,
-    }).then(response => response.json()).then(data => {
-      console.log(data);
+    }).then(response => response.json()).then(json => {
+      if (json.ok) {
+        showToast('Accesso effettuato con successo!', 'success');
+      }
+      else {
+        showToast('Username o password incorretti!', 'error');
+      }
     });
-    showToast('Accesso effettuato con successo!', 'success');
   }
 </script>
 </body>
