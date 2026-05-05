@@ -368,7 +368,7 @@
         placeholder="es. elettronica, abbigliamento, sport…"
         autocomplete="off"
       />
-      <button class="btn-cerca" id="btn-cerca" onclick="cercaArticoli()">
+      <button class="btn-cerca" id="btn-cerca" onclick="cercaArticoli()" type="button">
         <span class="btn-icon">🔍</span>
         <span id="btn-label">Cerca</span>
         <span class="spinner" id="spinner"></span>
@@ -411,7 +411,7 @@
 <footer>🛒 catalogo articoli 💸 — webapp dimostrativa</footer>
 
 <script>
-  const API_ENDPOINT = '/api/articoli'; // ← modifica questo URL con il tuo endpoint reale
+  const API_ENDPOINT = ''; // ← modifica questo URL con il tuo endpoint reale
 
   let rawVisible = false;
 
@@ -432,8 +432,8 @@
     try {
       const response = await fetch(API_ENDPOINT, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ categoria })
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+        body: 'category=' + categoria
       });
 
       if (!response.ok) {

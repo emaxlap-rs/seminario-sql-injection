@@ -22,7 +22,8 @@ public class Login {
                     String username = postData.get("username");
                     String password = postData.get("password");
                     try {
-                        Utils.sendJson(httpExchange, Critical.authVuln(username, password).toJson());
+                        String ans = "{ \"ok\": " + Critical.authVuln(username, password) + " }";
+                        Utils.sendJson(httpExchange, ans);
                     }
                     catch (Exception e) {
                         System.err.println("Eccezione: " + e.getMessage());
@@ -54,7 +55,8 @@ public class Login {
                     String username = postData.get("username");
                     String password = postData.get("password");
                     try {
-                        Utils.sendJson(httpExchange, Critical.authFixed(username, password).toJson());
+                        String ans = "{ \"ok\": " + Critical.authFixed(username, password) + " }";
+                        Utils.sendJson(httpExchange, ans);
                     } catch (Exception e) {
                         System.err.println("Eccezione: " + e.getMessage());
                     }

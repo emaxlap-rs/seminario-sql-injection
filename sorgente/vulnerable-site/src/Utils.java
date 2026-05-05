@@ -2,10 +2,14 @@ import com.sun.net.httpserver.HttpExchange;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.HashMap;
 
 public class Utils {
     public static void sendBytes(HttpExchange httpExchange, byte[] data) throws IOException {
+        httpExchange.sendResponseHeaders(200, data.length);
         OutputStream outputStream = httpExchange.getResponseBody();
         outputStream.write(data);
         outputStream.flush();
@@ -61,5 +65,25 @@ public class Utils {
         String postString = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         inputStream.close();
         return buildHashMap(postString);
+    }
+    public static String resultSetToJson(ResultSet rs) throws SQLException {
+        StringBuilder sb = new StringBuilder("[");
+        while (rs.next()) {
+            sb.append("{");
+            ResultSetMetaData metaData = rs.getMetaData();
+            int columnCount = metaData.getColumnCount();
+            for (int i = 1; i <= columnCount; ++i) {
+                String columnName = metaData.getColumnName(i);
+                Object object = rs.getObject(i);
+                sb.append("\"").append(columnName).append("\":");
+                switch (object.getClass().getTypeName()) {
+                    default -> System.out.println(columnName + " -> " + object.getClass().getTypeName());
+                }
+            }
+            sb.append("},");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append("]");
+        return sb.toString();
     }
 }

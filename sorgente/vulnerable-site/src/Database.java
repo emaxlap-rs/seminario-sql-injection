@@ -5,7 +5,7 @@ import java.util.Properties;
 
 public class Database {
     private static final String DATABASE_URL = "jdbc:postgresql://localhost/example";
-    private static final String DATABASE_USER = "example";
+    private static final String DATABASE_USER = "postgres";
 
     private static Connection connection = null;
     public static Connection getConnection() throws SQLException {

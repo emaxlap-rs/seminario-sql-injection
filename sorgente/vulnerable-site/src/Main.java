@@ -19,7 +19,7 @@ public class Main {
 
         server.createContext("/login/fixed", Login.fixedSiteHandler);
 
-        server.createContext("/products/vuln");
+        server.createContext("/products/vuln", Products.vulnerableSiteHandler);
 
         server.start();
         System.out.println("Server started on port " + PORT + "!");

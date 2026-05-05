@@ -11,20 +11,18 @@ public class Products {
         switch (method) {
             case "GET":
                 String queryString = httpExchange.getRequestURI().getQuery();
-                Utils.sendFile(httpExchange, new File("login.html"), "text/html; charset=utf-8");
+                Utils.sendFile(httpExchange, new File("articoli.html"), "text/html; charset=utf-8");
                 break;
             case "POST":
                 HashMap<String, String> postData = Utils.parsePost(httpExchange);
                 postData.forEach((k, v) -> {
                     System.out.println(k + " " + v);
                 });
-                if (postData.containsKey("username") &&  postData.containsKey("password")) {
-                    String username = postData.get("username");
-                    String password = postData.get("password");
+                if (postData.containsKey("category")) {
+                    String category = postData.get("category");
                     try {
-                        Utils.sendJson(httpExchange, Critical.authVuln(username, password).toJson());
-                    }
-                    catch (Exception e) {
+                        Utils.sendJson(httpExchange, Critical.recordRetrievalVuln(category));
+                    } catch (Exception e) {
                         System.err.println("Eccezione: " + e.getMessage());
                     }
                 }
