@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SQL Injection — Demo Lab</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0c0f;
+      --surface: #111418;
+      --border: #1e2530;
+      --accent-red: #ff3b3b;
+      --accent-green: #00e87a;
+      --accent-yellow: #ffd600;
+      --text: #c8d0dc;
+      --muted: #4a5568;
+      --mono: 'Share Tech Mono', monospace;
+      --sans: 'Syne', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* scanline effect */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.07) 2px,
+        rgba(0,0,0,0.07) 4px
+      );
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* noise grain */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9;
+      opacity: 0.3;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 780px;
+      position: relative;
+      z-index: 20;
+    }
+
+    /* header */
+    header {
+      margin-bottom: 3rem;
+      animation: fadeDown 0.6s ease both;
+    }
+
+    .label {
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+
+    h1 {
+      font-family: var(--sans);
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      font-weight: 800;
+      line-height: 1;
+      color: #fff;
+    }
+
+    h1 span.inject {
+      color: var(--accent-red);
+      position: relative;
+    }
+
+    h1 span.inject::after {
+      content: '_';
+      animation: blink 1s step-start infinite;
+      color: var(--accent-red);
+    }
+
+    .subtitle {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      max-width: 480px;
+      line-height: 1.7;
+    }
+
+    /* divider */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, var(--border) 0%, transparent 100%);
+      margin: 2rem 0;
+    }
+
+    /* section */
+    .section-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* cards grid */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 560px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.4rem 1.6rem;
+      text-decoration: none;
+      display: block;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s, transform 0.2s;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .card:nth-child(1) { animation-delay: 0.1s; }
+    .card:nth-child(2) { animation-delay: 0.2s; }
+    .card:nth-child(3) { animation-delay: 0.3s; }
+    .card:nth-child(4) { animation-delay: 0.4s; }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      transition: opacity 0.2s;
+    }
+
+    .card.vuln::before  { background: var(--accent-red); }
+    .card.fixed::before { background: var(--accent-green); }
+
+    .card:hover {
+      transform: translateX(4px);
+    }
+
+    .card.vuln:hover  { border-color: var(--accent-red); }
+    .card.fixed:hover { border-color: var(--accent-green); }
+
+    .card-badge {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 0.2em 0.6em;
+      border-radius: 2px;
+      display: inline-block;
+      margin-bottom: 0.75rem;
+      font-family: var(--mono);
+    }
+
+    .card.vuln  .card-badge { background: rgba(255,59,59,0.12); color: var(--accent-red); }
+    .card.fixed .card-badge { background: rgba(0,232,122,0.1);  color: var(--accent-green); }
+
+    .card-title {
+      font-family: var(--sans);
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+
+    .card-url {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 0.8rem;
+      word-break: break-all;
+    }
+
+    .card-desc {
+      font-size: 0.75rem;
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    /* arrow */
+    .card-arrow {
+      position: absolute;
+      right: 1.2rem;
+      bottom: 1.2rem;
+      font-size: 1rem;
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .card.vuln  .card-arrow { color: var(--accent-red); }
+    .card.fixed .card-arrow { color: var(--accent-green); }
+
+    .card:hover .card-arrow { opacity: 1; transform: translateX(3px); }
+
+    /* attack type tag */
+    .attack-tag {
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent-yellow);
+      margin-bottom: 0.3rem;
+    }
+
+    /* footer */
+    footer {
+      margin-top: 2.5rem;
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      animation: fadeUp 0.6s 0.5s ease both;
+    }
+
+    /* animations */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header>
+      <p class="label">Security Lab // Didattica</p>
+      <h1>SQL <span class="inject">Injection</span></h1>
+      <p class="subtitle">
+        Esempi di sistemi attaccabili e relative versioni protette.
+        Seleziona uno scenario per esplorare la vulnerabilità o la sua correzione.
+      </p>
+    </header>
+
+    <!-- LOGIN -->
+    <p class="section-label">Scenario 01 — Login Form</p>
+    <div class="grid">
+
+      <a class="card vuln" href="/login/vuln">
+        <p class="attack-tag">Tautologia</p>
+        <span class="card-badge">● Vulnerabile</span>
+        <p class="card-title">Login — Versione Vulnerabile</p>
+        <p class="card-url">/login/vuln</p>
+        <p class="card-desc">
+          Pagina di login che concatena direttamente l'input di username e password
+          ricevuto dall'utente nella query SQL. Vulnerabile ad un bypass tramite tautologia (es. <code>' OR true=true--</code>).
+        </p>
+        <span class="card-arrow">→</span>
+      </a>
+
+      <a class="card fixed" href="/login/fixed">
+        <p class="attack-tag">Tautologia</p>
+        <span class="card-badge">✔ Corretta</span>
+        <p class="card-title">Login — Versione Corretta</p>
+        <p class="card-url">/login/fixed</p>
+        <p class="card-desc">
+          Stessa pagina con query parametrizzate che neutralizzano completamente l'iniezione tramite tautologia.
+        </p>
+        <span class="card-arrow">→</span>
+      </a>
+
+    </div>
+
+    <!-- PRODUCTS -->
+    <p class="section-label">Scenario 02 — Product Listing</p>
+    <div class="grid">
+
+      <a class="card vuln" href="/products/vuln">
+        <p class="attack-tag">UNION-based</p>
+        <span class="card-badge">● Vulnerabile</span>
+        <p class="card-title">Prodotti — Versione Vulnerabile</p>
+        <p class="card-url">/products/vuln</p>
+        <p class="card-desc">
+          Pagina che espone un parametro di ricerca iniettabile (categoria).
+          Vulnerabile all'estrazione di dati arbitrari tramite l'operatore <code>UNION SELECT</code>.
+        </p>
+        <span class="card-arrow">→</span>
+      </a>
+
+      <a class="card fixed" href="/products/fixed">
+        <p class="attack-tag">UNION-based</p>
+        <span class="card-badge">✔ Corretta</span>
+        <p class="card-title">Prodotti — Versione Corretta</p>
+        <p class="card-url">/products/fixed</p>
+        <p class="card-desc">
+          Versione sicura con prepared statements sui parametri accettati, che blocca qualsiasi tentativo UNION-based.
+        </p>
+        <span class="card-arrow">→</span>
+      </a>
+    </div>
+    <footer>
+      Solo per scopi didattici. Non utilizzare queste tecniche su sistemi reali senza autorizzazione.
+    </footer>
+  </div>
+</body>
+</html>

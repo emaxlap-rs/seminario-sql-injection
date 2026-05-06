@@ -76,13 +76,24 @@ public class Utils {
                 String columnName = metaData.getColumnName(i);
                 Object object = rs.getObject(i);
                 sb.append("\"").append(columnName).append("\":");
-                switch (object.getClass().getTypeName()) {
-                    default -> System.out.println(columnName + " -> " + object.getClass().getTypeName());
+                if (object == null) {
+                    sb.append("null");
+                }
+                else if (object.getClass().getTypeName().equals("java.lang.String")) {
+                    sb.append("\"").append(object).append("\"");
+                }
+                else {
+                    sb.append(object);
+                }
+                if (i < columnCount) {
+                    sb.append(",");
                 }
             }
-            sb.append("},");
+            sb.append("}");
+            if (!rs.isLast()) {
+                sb.append(",");
+            }
         }
-        sb.deleteCharAt(sb.length() - 1);
         sb.append("]");
         return sb.toString();
     }

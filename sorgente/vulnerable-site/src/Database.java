@@ -6,12 +6,16 @@ import java.util.Properties;
 public class Database {
     private static final String DATABASE_URL = "jdbc:postgresql://localhost/example";
     private static final String DATABASE_USER = "postgres";
+    private static final String DATABASE_PASSWORD = null;
 
     private static Connection connection = null;
     public static Connection getConnection() throws SQLException {
         if (connection == null) {
             Properties props = new Properties();
             props.setProperty("user", DATABASE_USER);
+            if (DATABASE_PASSWORD != null) {
+                props.setProperty("password", DATABASE_PASSWORD);
+            }
             connection = DriverManager.getConnection(DATABASE_URL, props);
         }
         return connection;

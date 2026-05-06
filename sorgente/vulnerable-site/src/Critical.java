@@ -1,4 +1,3 @@
-import javax.xml.crypto.Data;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,7 +12,7 @@ public class Critical {
                 "FROM login.users " +
                 "WHERE users.username = '" + username + "' AND users.password = '" + password +"'";
 
-        System.out.println("Executed query: " + stmt.toString());
+        System.out.println("Executed query: " + query);
 
         ResultSet rs = stmt.executeQuery(query);
 
@@ -33,10 +32,10 @@ public class Critical {
 
         PreparedStatement stmt = Database.getConnection().prepareStatement(query);
 
-        System.out.println("Executed query: " + stmt.toString());
-
         stmt.setString(1, username);
         stmt.setString(2, password);
+
+        System.out.println("Executed query: " + stmt.toString());
 
         ResultSet rs = stmt.executeQuery();
 
@@ -45,13 +44,41 @@ public class Critical {
     }
 
     public static String recordRetrievalVuln(String category) throws SQLException {
-        String query = "SELECT * FROM products.products" + (!category.isEmpty() ? " WHERE products.category = '" + category + "'" : "");
+        String query;
+        if (!category.isEmpty()) {
+            query = "SELECT * FROM products.products WHERE category = '" + category + "'";
+        }
+        else {
+            query = "SELECT * FROM products.products";
+        }
 
         Statement stmt = Database.getConnection().createStatement();
 
-        System.out.println("Executed query: " + stmt.toString());
+        System.out.println("Executed query: " + query);
 
         ResultSet rs = stmt.executeQuery(query);
+
+        return Utils.resultSetToJson(rs);
+    }
+
+    public static String recordRetrievalFixed(String category) throws SQLException {
+        String query;
+        if (!category.isEmpty()) {
+            query = "SELECT * FROM products.products WHERE category = ?";
+        }
+        else {
+            query = "SELECT * FROM products.products";
+        }
+
+        PreparedStatement stmt = Database.getConnection().prepareStatement(query);
+
+        if (!category.isEmpty()) {
+            stmt.setString(1, category);
+        }
+
+        System.out.println("Executed query: " + stmt.toString());
+
+        ResultSet rs = stmt.executeQuery();
 
         return Utils.resultSetToJson(rs);
     }

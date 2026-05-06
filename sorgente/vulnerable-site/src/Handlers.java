@@ -1,28 +1,34 @@
+import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 
-public class Login {
-    public static HttpHandler vulnerableSiteHandler = (httpExchange) -> {
-        String method = httpExchange.getRequestMethod();
-        String path = httpExchange.getRequestURI().getPath();
+public class Handlers {
+    public static HttpHandler indexHandler = (httpExchange) -> {
+        Utils.sendFile(httpExchange, new File("index.html"), "text/html; charset=utf-8");
+        httpExchange.close();
+    };
+    public static HttpHandler vulnerableLoginHandler = (httpExchange) -> handleLogin(httpExchange, false);
+    public static HttpHandler fixedLoginHandler = (httpExchange) -> handleLogin(httpExchange, true);
+    public static HttpHandler vulnerableProductsHandler = (httpExchange) -> handleProducts(httpExchange, false);
+    public static HttpHandler fixedProductsHandler = (httpExchange) -> handleProducts(httpExchange, true);
 
+    private static void handleLogin(HttpExchange httpExchange, boolean safe) throws IOException {
+        String method = httpExchange.getRequestMethod();
         switch (method) {
             case "GET":
-                String queryString = httpExchange.getRequestURI().getQuery();
                 Utils.sendFile(httpExchange, new File("login.html"), "text/html; charset=utf-8");
                 break;
             case "POST":
                 HashMap<String, String> postData = Utils.parsePost(httpExchange);
-                postData.forEach((k, v) -> {
-                    System.out.println(k + " " + v);
-                });
                 if (postData.containsKey("username") &&  postData.containsKey("password")) {
                     String username = postData.get("username");
                     String password = postData.get("password");
                     try {
-                        String ans = "{ \"ok\": " + Critical.authVuln(username, password) + " }";
+                        boolean authorized = (safe ? Critical.authFixed(username, password) : Critical.authVuln(username, password));
+                        String ans = "{ \"ok\": " + authorized + " }";
                         Utils.sendJson(httpExchange, ans);
                     }
                     catch (Exception e) {
@@ -38,25 +44,20 @@ public class Login {
                 break;
         }
         httpExchange.close();
-    };
-
-    public static HttpHandler fixedSiteHandler = (httpExchange) -> {
+    }
+    private static void handleProducts(HttpExchange httpExchange, boolean safe) throws IOException {
         String method = httpExchange.getRequestMethod();
-        String path = httpExchange.getRequestURI().getPath();
-
         switch (method) {
             case "GET":
-                String queryString = httpExchange.getRequestURI().getQuery();
-                Utils.sendFile(httpExchange, new File("login.html"), "text/html; charset=utf-8");
+                Utils.sendFile(httpExchange, new File("articoli.html"), "text/html; charset=utf-8");
                 break;
             case "POST":
                 HashMap<String, String> postData = Utils.parsePost(httpExchange);
-                if (postData.containsKey("username") &&  postData.containsKey("password")) {
-                    String username = postData.get("username");
-                    String password = postData.get("password");
+                if (postData.containsKey("category")) {
+                    String category = postData.get("category");
                     try {
-                        String ans = "{ \"ok\": " + Critical.authFixed(username, password) + " }";
-                        Utils.sendJson(httpExchange, ans);
+                        String json = (safe ? Critical.recordRetrievalFixed(category) : Critical.recordRetrievalVuln(category));
+                        Utils.sendJson(httpExchange, json);
                     } catch (Exception e) {
                         System.err.println("Eccezione: " + e.getMessage());
                     }
@@ -70,5 +71,5 @@ public class Login {
                 break;
         }
         httpExchange.close();
-    };
+    }
 }
