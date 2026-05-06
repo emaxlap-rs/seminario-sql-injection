@@ -9,9 +9,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(PORT), 0);
 
-        server.createContext("/", (httpExchange) -> {
-            Utils.sendFile(httpExchange, new File("index.html"), "text/html; charset=utf-8");
-        });
+        server.createContext("/", Handlers.indexHandler);
 
         server.createContext("/login/vuln", Handlers.vulnerableLoginHandler);
 
