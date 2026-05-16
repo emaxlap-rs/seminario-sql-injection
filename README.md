@@ -1,5 +1,5 @@
 # Seminario SQL Injection
-Questa repository contiene tutto il materiale realizzato per il seminario vertente l'**SQL Injection**.__
+Questa repository contiene tutto il materiale realizzato per il seminario vertente l'**SQL Injection**.\
 _Progetto sviluppato nell'ambito dell'insegnamento di [BASI DI DATI E SISTEMI INFORMATIVI](https://poliba.coursecatalogue.cineca.it/af/2025?corso=LT17&annoOrdinamento=2022&pds=LT17-26&coorte=2024&ad=2185&piano=774&lingua=ita&sede=1005&linguaCC=it) presso il Politecnico di Bari_.
 ## Cosa puoi trovare in questa repository
 - Le slides e le immagini presentate durante il seminario ([vai lì](https://github.com/emaxlap-rs/seminario-sql-injection/tree/main/materiale))
@@ -18,5 +18,5 @@ Se ti interessa solo una cartella della repository nello specifico, puoi utilizz
 
 ---
 
-❋ _In un ambiente di produzione, pratiche come l'inserimento di credenziali come costanti nel codice sono **estremamente sconsigliate!**___
+❋ _In un ambiente di produzione, pratiche come l'inserimento di credenziali come costanti nel codice sono **estremamente sconsigliate!**_\
 Questo genere di dati andrebbe memorizzato in file esterni, passato all'applicativo tramite l'uso di variabili d'ambiente oppure attraverso parametri. In questo caso è stato fatto per ragioni di semplicità in quanto ci troviamo in un contesto locale (di laboratorio).
