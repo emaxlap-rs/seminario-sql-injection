@@ -4,7 +4,7 @@ _Progetto sviluppato nell'ambito dell'insegnamento di [BASI DI DATI E SISTEMI IN
 ## Cosa puoi trovare in questa repository
 - Le slides e le immagini presentate durante il seminario ([vai lì](https://github.com/emaxlap-rs/seminario-sql-injection/tree/main/materiale))
 - Il progetto del web server utilizzato in aula per le dimostrazioni pratiche ([vai lì](https://github.com/emaxlap-rs/seminario-sql-injection/tree/main/sorgente/vulnerable-site))
-- Il codice SQL per costruire il database di prova ([vai lì](https://github.com/emaxlap-rs/seminario-sql-injection/tree/main/sorgente/SQL))
+- Il codice SQL per costruire il database di prova ([vai lì](https://github.com/emaxlap-rs/seminario-sql-injection/tree/main/sorgente/sql))
 ## Tip
 Se ti interessa solo una cartella della repository nello specifico, puoi utilizzare strumenti come [Git Folder Downloader](https://gitfolderdownloader.github.io/), al posto di clonare l'intera repository.
 ## Come eseguire il webserver
