@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class Critical {
-    public static boolean authVuln(String username, String password) throws SQLException {
+    public static String authVuln(String username, String password) throws SQLException {
         Statement stmt = Database.getConnection().createStatement();
 
         // È qui che avviene il danno, la query è concatenata direttamente ai parametri attuali del metodo
@@ -20,10 +20,10 @@ public class Critical {
         // in questo caso estremamente semplificato concediamo l'accesso se l'utente esiste nella tabella 'users' e
         // il valore di password coincide con quello presente nella tupla dell'utente.
         // Il valore 'false' è considerato come un'autenticazione fallita.
-        return rs.next();
+        return (rs.next() ? rs.getString("username") : "");
     }
 
-    public static boolean authFixed(String username, String password) throws SQLException {
+    public static String authFixed(String username, String password) throws SQLException {
         // In questo caso la query si dice 'preparata' perché non contiene i valori in partenza bensì viene
         // popolata successivamente tramite il metodo 'setString()' dove i '?' forniscono un segnaposto
         String query = "SELECT * " +
@@ -39,8 +39,7 @@ public class Critical {
 
         ResultSet rs = stmt.executeQuery();
 
-        // rs.next() chiamata ora restituisce true se è presente una riga nella tabella risultato
-        return rs.next();
+        return (rs.next() ? rs.getString("username") : "");
     }
 
     public static String recordRetrievalVuln(String category) throws SQLException {

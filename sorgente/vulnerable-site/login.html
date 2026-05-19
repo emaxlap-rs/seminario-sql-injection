@@ -383,7 +383,7 @@
     document.getElementById('toast-msg').textContent = msg;
     t.className = 'toast ' + type;
     setTimeout(() => t.classList.add('show'), 10);
-    setTimeout(() => t.classList.remove('show'), 3000);
+    setTimeout(() => t.classList.remove('show'), 5000);
   }
 
   function handleLogin() {
@@ -402,7 +402,7 @@
       body: `username=${u}&password=${p}`,
     }).then(response => response.json()).then(json => {
       if (json.ok) {
-        showToast('Accesso effettuato con successo!', 'success');
+        showToast('Bentornato/a ' + json.username + '!', 'success');
       }
       else {
         showToast('Username o password incorretti!', 'error');

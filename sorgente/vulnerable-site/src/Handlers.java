@@ -27,8 +27,8 @@ public class Handlers {
                     String username = postData.get("username");
                     String password = postData.get("password");
                     try {
-                        boolean authorized = (safe ? Critical.authFixed(username, password) : Critical.authVuln(username, password));
-                        String ans = "{ \"ok\": " + authorized + " }";
+                        String login = (safe ? Critical.authFixed(username, password) : Critical.authVuln(username, password));
+                        String ans = "{ \"ok\": " + !login.isEmpty() + ", \"username\": \"" + login + "\" }";
                         Utils.sendJson(httpExchange, ans);
                     }
                     catch (Exception e) {

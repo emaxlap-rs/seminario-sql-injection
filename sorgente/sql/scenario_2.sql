@@ -1,14 +1,14 @@
-CREATE OR REPLACE SCHEMA products AUTHORIZATION example;
+CREATE SCHEMA IF NOT EXISTS products AUTHORIZATION example;
 
-CREATE OR REPLACE TABLE products.products (
+CREATE TABLE IF NOT EXISTS products.products (
 	id BIGINT PRIMARY KEY,
-	name VARCHAR(20) NUT NULL,
+	name VARCHAR(64) NOT NULL,
 	category VARCHAR(20) NOT NULL DEFAULT 'misc',
 	quantity INT NOT NULL DEFAULT 0,
 	price REAL NOT NULL DEFAULT 0.00
 );
 
-CREATE OR REPLACE TABLE products.users (
+CREATE TABLE IF NOT EXISTS products.users (
 	username VARCHAR(20) PRIMARY KEY,
 	password CHAR(232) NOT NULL,
 	is_admin BOOLEAN NOT NULL DEFAULT FALSE,
@@ -28,7 +28,7 @@ INSERT INTO products.products (id, name, category, quantity, price) VALUES
 (9, 'SuperLongProductName', 'Utensili', 10, 45.00),
 (10, 'Tazza', 'Cucina', 24, 12.90),
 (11, 'Apple Magic Keyboard', 'Elettronica', 18, 129.00),
-(12, 'Monitor LG 24" FHD', 'Elettronica', 6, 189.99),
+(12, 'Monitor LG 24 pollici FHD', 'Elettronica', 6, 189.99),
 (13, 'SSD Samsung 1TB', 'Elettronica', 30, 89.90),
 (14, 'Webcam Logitech C920', 'Elettronica', 12, 74.50),
 (15, 'Cuffie Sony WH-1000XM5', 'Elettronica', 7, 320.00),
